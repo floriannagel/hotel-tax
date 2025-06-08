@@ -51,12 +51,43 @@ const Home = () => {
 
   // --- Input Handlers ---
   const handleInputChange = (id: number, value: string) => {
-    const newInputs = inputs.map((input) =>
-      input.id === id ? { ...input, value } : input
-    );
-    setInputs(newInputs);
-    // Clear error message when user starts typing
-    if (error) setError('');
+    // Das Ergebnis wird ausgeblendet, wenn ein Wert nach der Berechnung geändert wird.
+    if (isResultVisible) {
+      setIsResultVisible(false);
+    }
+    // Regex, um die Eingabe auf Zahlen mit maximal zwei Dezimalstellen zu beschränken.
+    // Erlaubt sowohl Komma als auch Punkt als Trennzeichen.
+    const regex = /^\d*([,.]\d{0,2})?$/;
+
+    // Die Eingabe wird nur aktualisiert, wenn sie dem Muster entspricht.
+    if (regex.test(value)) {
+      const newInputs = inputs.map((input) =>
+        input.id === id ? { ...input, value } : input
+      );
+      setInputs(newInputs);
+      // Clear error message when user starts typing
+      if (error) setError('');
+    }
+  };
+
+  // Diese Funktion formatiert den Wert, wenn der Fokus vom Input-Feld entfernt wird.
+  const handleInputBlur = (id: number) => {
+    const input = inputs.find((i) => i.id === id);
+    if (!input || input.value.trim() === '') return;
+
+    // Wert für die Berechnung vorbereiten (Komma durch Punkt ersetzen)
+    const sanitizedValue = input.value.replace(',', '.');
+    const numericValue = parseFloat(sanitizedValue);
+
+    if (!isNaN(numericValue)) {
+      // Den Wert auf zwei Dezimalstellen formatieren und das Komma für die Anzeige wiederherstellen.
+      const formattedValue = numericValue.toFixed(2).replace('.', ',');
+
+      const newInputs = inputs.map((i) =>
+        i.id === id ? { ...i, value: formattedValue } : i
+      );
+      setInputs(newInputs);
+    }
   };
 
   const addInput = () => {
@@ -172,6 +203,8 @@ const Home = () => {
                     onChange={(e) =>
                       handleInputChange(input.id, e.target.value)
                     }
+                    // Fügt den onBlur-Event-Handler hinzu, um den Wert zu formatieren.
+                    onBlur={() => handleInputBlur(input.id)}
                     className={
                       error ? 'border-red-500 focus-visible:ring-red-500' : ''
                     }
