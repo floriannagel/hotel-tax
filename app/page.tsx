@@ -181,7 +181,7 @@ const Home = () => {
           <Card className="animate-in fade-in-0 slide-in-from-bottom-4 shadow-md duration-500">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-slate-600">
-                {`City Tax 5% (bei ${inputs.length} ${inputs.length > 1 ? 'Übernachtungen' : 'Übernachtung'})`}
+                {`City Tax pro Nacht (bei ${inputs.length} ${inputs.length > 1 ? 'Übernachtungen' : 'Übernachtung'})`}
               </CardTitle>
             </CardHeader>
             <CardContent>
