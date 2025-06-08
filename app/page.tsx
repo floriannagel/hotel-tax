@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +26,19 @@ const Home = () => {
   const [error, setError] = useState('');
   // Control the visibility of the output card
   const [isResultVisible, setIsResultVisible] = useState(false);
+
+  // --- Refs for Focus Management ---
+  // A ref to store the DOM node of the most recently added input
+  const lastInputRef = useRef<HTMLInputElement | null>(null);
+
+  // --- useEffect for Focusing ---
+  // This effect runs whenever the `inputs` array changes.
+  // If a new input was added, it focuses that input.
+  useEffect(() => {
+    if (lastInputRef.current) {
+      lastInputRef.current.focus();
+    }
+  }, [inputs.length]); // Dependency array ensures this runs only when an input is added or removed
 
   // --- Currency Formatter ---
   // Using de-DE locale for proper Euro formatting (e.g., 1.234,56 €)
@@ -64,8 +77,15 @@ const Home = () => {
     let hasError = false;
 
     for (const input of inputs) {
-      // Treat empty inputs as zero
-      if (input.value.trim() === '') continue;
+      // Check if the input is empty. If so, show an error.
+      if (input.value.trim() === '') {
+        setError(
+          'Bitte füllen Sie alle Felder aus oder entfernen Sie leere Zeilen.'
+        );
+        setIsResultVisible(false);
+        hasError = true;
+        break;
+      }
 
       // Replace comma with a period for correct parsing
       const sanitizedValue = input.value.replace(',', '.');
@@ -142,6 +162,8 @@ const Home = () => {
                     Betrag {index + 1}
                   </Label>
                   <Input
+                    // Conditionally apply the ref to the last input element in the array
+                    ref={index === inputs.length - 1 ? lastInputRef : null}
                     id={`amount-input-${input.id}`}
                     type="text" // Use text to allow comma input
                     inputMode="decimal" // Suggest numeric keyboard on mobile
@@ -168,7 +190,6 @@ const Home = () => {
                 </Button>
               </div>
             ))}
-            {error && <p className="pt-1 text-sm text-red-500">{error}</p>}
 
             <Button
               variant="outline"
@@ -203,6 +224,30 @@ const Home = () => {
                   {result.number}
                 </span>
               </div>
+            </CardContent>
+            <CardFooter>
+              <Button
+                variant="outline"
+                onClick={handleReset}
+                className="flex w-full items-center gap-2 text-slate-600"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Zurücksetzen
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
+
+        {/* Output Card for Error - Rendered Conditionally */}
+        {error && !isResultVisible && (
+          <Card className="animate-in fade-in-0 slide-in-from-bottom-4 border-red-500/50 shadow-md duration-500">
+            <CardHeader>
+              <CardTitle className="text-sm font-medium text-red-600">
+                Fehler bei der Eingabe
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-slate-700">{error}</p>
             </CardContent>
             <CardFooter>
               <Button
