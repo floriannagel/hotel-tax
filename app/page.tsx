@@ -71,7 +71,7 @@ export default function Home() {
 
       // Validate the input
       if (isNaN(numericValue) || numericValue < 0) {
-        setError('Please ensure all amounts are valid positive numbers.');
+        setError('Bitte stellen Sie sicher, dass alles positive Beträge sind.');
         setIsResultVisible(false);
         hasError = true;
         break; // Stop on the first error
