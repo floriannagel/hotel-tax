@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Trash2, PlusCircle } from 'lucide-react'; // Using lucide-react for icons
 
-export default function Home() {
+const Home = () => {
   // --- State Management ---
   // Store an array of input objects, each with a unique id and a value
   const [inputs, setInputs] = useState([{ id: 1, value: '' }]);
@@ -67,11 +67,15 @@ export default function Home() {
       // Treat empty inputs as zero
       if (input.value.trim() === '') continue;
 
-      const numericValue = parseFloat(input.value);
+      // Replace comma with a period for correct parsing
+      const sanitizedValue = input.value.replace(',', '.');
+      const numericValue = parseFloat(sanitizedValue);
 
       // Validate the input
       if (isNaN(numericValue) || numericValue < 0) {
-        setError('Bitte stellen Sie sicher, dass alles positive Beträge sind.');
+        setError(
+          'Bitte stellen Sie sicher, dass alle Beträge gültige, positive Zahlen sind.'
+        );
         setIsResultVisible(false);
         hasError = true;
         break; // Stop on the first error
@@ -85,7 +89,7 @@ export default function Home() {
     setError('');
 
     // Multiply the total sum by 0.05
-    const finalResultValue = sum * 0.05;
+    const finalResultValue = (sum / inputs.length) * 0.05;
 
     // Format the final result into its constituent parts
     const parts = currencyFormatter.formatToParts(finalResultValue);
@@ -129,7 +133,8 @@ export default function Home() {
                   </Label>
                   <Input
                     id={`amount-input-${input.id}`}
-                    type="number"
+                    type="text" // Use text to allow comma input
+                    inputMode="decimal" // Suggest numeric keyboard on mobile
                     placeholder={`Betrag ${index + 1} (€)`}
                     value={input.value}
                     onChange={(e) =>
@@ -176,7 +181,7 @@ export default function Home() {
           <Card className="animate-in fade-in-0 slide-in-from-bottom-4 shadow-md duration-500">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-slate-600">
-                Betrag mit 5%
+                {`City Tax 5% (bei ${inputs.length} ${inputs.length > 1 ? 'Übernachtungen' : 'Übernachtung'})`}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -194,4 +199,6 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};
+
+export default Home;
