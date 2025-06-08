@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Trash2, PlusCircle } from 'lucide-react'; // Using lucide-react for icons
+import { Trash2, PlusCircle, RefreshCw } from 'lucide-react'; // Using lucide-react for icons
 
 const Home = () => {
   // --- State Management ---
@@ -111,6 +111,16 @@ const Home = () => {
     setIsResultVisible(true);
   };
 
+  // --- Reset Function ---
+  const handleReset = () => {
+    // Resets the form to its initial state
+    setInputs([{ id: 1, value: '' }]);
+    nextId.current = 2; // Reset the ID counter
+    setIsResultVisible(false);
+    setError('');
+    setResult({ number: '0.00', currency: '€' });
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4 font-sans text-slate-900">
       <div className="w-full max-w-md space-y-6">
@@ -166,7 +176,7 @@ const Home = () => {
               className="flex w-full items-center gap-2 text-slate-600"
             >
               <PlusCircle className="h-4 w-4" />
-              Betrag hinzufügen
+              Übernachtung hinzufügen
             </Button>
           </CardContent>
           <CardFooter>
@@ -194,6 +204,16 @@ const Home = () => {
                 </span>
               </div>
             </CardContent>
+            <CardFooter>
+              <Button
+                variant="outline"
+                onClick={handleReset}
+                className="flex w-full items-center gap-2 text-slate-600"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Zurücksetzen
+              </Button>
+            </CardFooter>
           </Card>
         )}
       </div>
